@@ -136,6 +136,7 @@ int main()
 {
     cout << "Start..." << endl;
 
+    // bootstraping
     ShapeFactory shape_factory;
     shape_factory.register_creator(Rectangle::id, &make_unique<Rectangle>);
     shape_factory.register_creator(Square::id, &make_unique<Square>);
