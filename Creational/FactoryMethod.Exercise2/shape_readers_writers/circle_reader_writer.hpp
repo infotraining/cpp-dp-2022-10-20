@@ -3,14 +3,20 @@
 
 #include "shape_reader_writer.hpp"
 
+
 namespace Drawing
 {
     namespace IO
     {
-        // TODO
         class CircleReaderWriter : public ShapeReaderWriter
         {
+        public:
+            CircleReaderWriter() = default;
+
+            void read(Shape& shp, std::istream& in) override;
+            void write(const Shape& shp, std::ostream& out) override;
         };
+
     }
 }
 
