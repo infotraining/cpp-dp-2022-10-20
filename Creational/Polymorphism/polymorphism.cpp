@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include <functional>
+#include <variant>
 
 using namespace std::literals;
 
@@ -104,6 +105,15 @@ namespace DuckTyping
         }
     };
 
+    class Humbucker
+    {
+    public:
+        std::string operator()(const std::string& string_vibrations) const
+        {
+            return "strong, noiseless "s + string_vibrations;
+        }
+    };
+
     struct Guitar
     {
         Pickup pickup;
@@ -118,6 +128,52 @@ namespace DuckTyping
             std::cout << "Playing " << pickup(sound) << std::endl;
         }
     };
+}
+
+namespace VariantPolymorphism
+{
+    class SingleCoil
+    {
+    public:
+        std::string convert_signal(const std::string& string_vibrations) const
+        {
+            return "humming "s + string_vibrations;
+        }
+    };
+
+    class Humbucker
+    {
+    public:
+        std::string convert_signal(const std::string& string_vibrations) const
+        {
+            return "strong, noiseless "s + string_vibrations;
+        }
+    };
+
+    using Pickup = std::variant<SingleCoil, Humbucker>;
+
+    class Guitar
+    {
+        Pickup pickup_;
+
+    public:
+        Guitar() = default;
+
+        Guitar(Pickup pickup)
+            : pickup_{std::move(pickup)}
+        {
+        }
+
+        void play(const std::string& sound)
+        {
+            std::cout << "Playing ";
+            
+            std::cout << std::visit([&sound](auto& p) { return p.convert_signal(sound);}, pickup_);
+
+            std::cout << std::endl;
+        }
+    };
+
 }
 
 int main()
@@ -157,5 +213,15 @@ int main()
         };
 
         g.play("A-power-cord");
+    }
+
+    {
+        using namespace VariantPolymorphism;
+
+        SingleCoil sc;
+        Humbucker h;
+
+        Guitar g{h};
+        g.play("E-power-cord");
     }
 }
