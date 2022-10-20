@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <list>
 
 using namespace std;
 
@@ -111,4 +112,16 @@ int main()
     std::string id_from_config = "DbLogger";
     Service srv(logger_factory.at(id_from_config));
     srv.run();
+}
+
+void factory_method_in_std_library()
+{
+    std::list<int> data = {1, 2, 3, 4};
+
+    for(auto it = data.begin(); it != data.end(); ++it) // begin() & end() - factory methods
+    {
+        const auto& item = *it;
+        std::cout << item << " ";
+    }    
+    std::cout << "\n";
 }

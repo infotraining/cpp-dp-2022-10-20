@@ -111,7 +111,6 @@ namespace Canonical
             return std::make_unique<DbLogger>(connection_str_);
         }
     };
-
 }
 
 #endif /*FACTORY_HPP_*/
