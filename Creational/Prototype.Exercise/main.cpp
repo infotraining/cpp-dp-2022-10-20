@@ -28,6 +28,10 @@ public:
     {
     }
 
+    // TODO
+    GraphicsDoc(const GraphicsDoc& source)
+    {}
+
     void add(unique_ptr<Shape> shp)
     {
         shapes_.push_back(std::move(shp));
@@ -92,8 +96,7 @@ int main()
 
     doc.render();
 
-    // TODO: Uncomment this code
-    // GraphicsDoc doc2 = doc;
+    GraphicsDoc doc2 = doc;
 
-    // doc2.save("new_drawing.txt");
+    doc2.save("new_drawing.txt");
 }

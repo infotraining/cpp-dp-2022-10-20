@@ -165,6 +165,7 @@ public:
     }
 
 protected:
+
 #ifdef MOTIF
     static inline MotifFactory widgetFactory;
 #else // WINDOWS
