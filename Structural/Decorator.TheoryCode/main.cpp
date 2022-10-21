@@ -1,4 +1,5 @@
 #include "decorator.hpp"
+
 #include <memory>
 
 using namespace std;
@@ -18,4 +19,10 @@ int main()
     client(*d2);
 
     cout << "\n\n";
+
+    auto decorated_component = std::make_shared<ConcreteDecoratorB>(
+        std::make_shared<ConcreteDecoratorA>(
+            std::make_shared<ConcreteComponent>()));
+    
+    client(*decorated_component);
 }
