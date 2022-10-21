@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#define MOTIF
+#define WINDOWS
 
 enum class IconType
 {
@@ -63,6 +63,15 @@ public:
     }
 };
 
+class WidgetFactory
+{
+public:
+    virtual std::unique_ptr<Button> MakeButton(const std::string& caption, IconType icon_type) = 0;
+    virtual std::unique_ptr<Menu> MakeMenu(const std::string& text) = 0;
+    virtual ~WidgetFactory() = default;
+};
+
+// Motif family
 class MotifButton : public Button
 {
 public:
@@ -84,6 +93,22 @@ public:
         cout << "MotifMenu { " << text() << " }\n";
     }
 };
+
+class MotifFactory : public WidgetFactory
+{
+public:
+    std::unique_ptr<Button> MakeButton(const std::string& caption, IconType icon_type) override
+    {
+        return std::make_unique<MotifButton>(caption, icon_type);
+    }
+
+    std::unique_ptr<Menu> MakeMenu(const std::string& text) override
+    {
+        return std::make_unique<MotifMenu>(text);
+    }
+};
+
+// Windows family
 
 class WindowsButton : public Button
 {
@@ -107,6 +132,20 @@ public:
     }
 };
 
+class WindowsFactory : public WidgetFactory
+{
+public:
+    std::unique_ptr<Button> MakeButton(const std::string& caption, IconType icon_type) override
+    {
+        return std::make_unique<WindowsButton>(caption, icon_type);
+    }
+
+    std::unique_ptr<Menu> MakeMenu(const std::string& text) override
+    {
+        return std::make_unique<WindowsMenu>(text);
+    }
+};
+
 class Window
 {
     std::vector<std::unique_ptr<Widget>> widgets;
@@ -124,6 +163,13 @@ public:
     {
         widgets.push_back(std::move(widget));
     }
+
+protected:
+#ifdef MOTIF
+    static inline MotifFactory widgetFactory;
+#else // WINDOWS
+    static inline WindowsFactory widgetFactory;
+#endif
 };
 
 class WindowOne : public Window
@@ -132,13 +178,15 @@ class WindowOne : public Window
 public:
     WindowOne()
     {
-#ifdef MOTIF
-        add_widget(std::make_unique<MotifButton>("OK", IconType::ok));
-        add_widget(std::make_unique<MotifMenu>("File"));
-#else // WINDOWS
-        add_widget(std::make_unique<WindowsButton>("OK", IconType::ok));
-        add_widget(std::make_unique<WindowsMenu>("File"));
-#endif
+        // #ifdef MOTIF
+        //         add_widget(std::make_unique<MotifButton>("OK", IconType::ok));
+        //         add_widget(std::make_unique<MotifMenu>("File"));
+        // #else // WINDOWS
+        //         add_widget(std::make_unique<WindowsButton>("OK", IconType::ok));
+        //         add_widget(std::make_unique<WindowsMenu>("File"));
+        // #endif
+        add_widget(widgetFactory.MakeButton("OK", IconType::ok));
+        add_widget(widgetFactory.MakeMenu("File"));
     }
 };
 
@@ -148,15 +196,18 @@ class WindowTwo : public Window
 public:
     WindowTwo()
     {
-#ifdef MOTIF
-        add_widget(std::make_unique<MotifMenu>("Edit"));
-        add_widget(std::make_unique<MotifButton>("OK", IconType::ok));
-        add_widget(std::make_unique<MotifButton>("Cancel", IconType::cancel));
-#else // WINDOWS
-        add_widget(std::make_unique<WindowsMenu>("Edit"));
-        add_widget(std::make_unique<WindowsButton>("OK", IconType::ok));
-        add_widget(std::make_unique<WindowsButton>("Cancel", IconType::cancel));
-#endif
+        // #ifdef MOTIF
+        //         add_widget(std::make_unique<MotifMenu>("Edit"));
+        //         add_widget(std::make_unique<MotifButton>("OK", IconType::ok));
+        //         add_widget(std::make_unique<MotifButton>("Cancel", IconType::cancel));
+        // #else // WINDOWS
+        //         add_widget(std::make_unique<WindowsMenu>("Edit"));
+        //         add_widget(std::make_unique<WindowsButton>("OK", IconType::ok));
+        //         add_widget(std::make_unique<WindowsButton>("Cancel", IconType::cancel));
+        // #endif
+        add_widget(widgetFactory.MakeMenu("Edit"));
+        add_widget(widgetFactory.MakeButton("OK", IconType::ok));
+        add_widget(widgetFactory.MakeButton("Cancel", IconType::cancel));
     }
 };
 

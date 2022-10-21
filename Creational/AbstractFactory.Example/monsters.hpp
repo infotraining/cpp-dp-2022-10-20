@@ -25,6 +25,8 @@ namespace Game
     {
     };
 
+    // Silly family
+
     class SillySoldier : public Soldier
     {
     public:
@@ -51,6 +53,8 @@ namespace Game
             std::cout << "SillySuperMonster Action" << std::endl;
         }
     };
+
+    // Bad family
 
     class BadSoldier : public Soldier
     {
