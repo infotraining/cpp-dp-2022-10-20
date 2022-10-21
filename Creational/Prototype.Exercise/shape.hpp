@@ -11,9 +11,20 @@ namespace Drawing
         virtual ~Shape() = default;
         virtual void move(int x, int y) = 0;
         virtual void draw() const = 0;
+        virtual std::unique_ptr<Shape> clone() const = 0;
     };
 
-    class ShapeBase : public Shape
+    template<typename TDerived, typename TBase = Shape>
+    class CloneableShape : public TBase
+    {
+        std::unique_ptr<Shape> clone() const override
+        {
+            return std::make_unique<TDerived>(static_cast<const TDerived&>(*this));
+        }
+    };
+
+    template <typename TShape>
+    class ShapeBase : public CloneableShape<TShape>
     {
         Point coord_; // composition
     public:
