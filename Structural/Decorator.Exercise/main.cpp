@@ -1,4 +1,5 @@
 #include "starbugs_coffee.hpp"
+#include <cassert>
 #include <memory>
 
 void client(std::unique_ptr<Coffee> coffee)
