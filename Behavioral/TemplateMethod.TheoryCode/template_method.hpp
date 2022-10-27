@@ -43,7 +43,7 @@ using Code = std::string;
 // "AbstractClass"
 class AuthenticationService
 {
-protected:
+protected: // interface for programmer
     virtual Code generate_secret_code() = 0;
     virtual Code enter_secret_code() = 0;
     virtual void on_success() = 0;
@@ -54,8 +54,8 @@ protected:
         return std::make_unique<SmsService>();
     }
 
-public:
-    bool login(const User& user)
+public: // interface for client
+    bool login(const User& user) // template method
     {
         Code code = generate_secret_code();
 

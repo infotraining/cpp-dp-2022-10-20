@@ -9,7 +9,7 @@ using namespace std;
 class Taxpayer
 {
     int id_;
-    boost::flyweight<std::string> first_name_;
+    boost::flyweight<std::string> first_name_; // shared name for all Taxpayer instances
     std::string last_name_;
 
 public:
