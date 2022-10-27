@@ -1,17 +1,11 @@
 #ifndef STOCK_HPP_
 #define STOCK_HPP_
 
+#include <boost/signals2.hpp>
 #include <iostream>
 #include <string>
 
-class Observer
-{
-public:
-    virtual void update(/*...*/) = 0;
-    virtual ~Observer()
-    {
-    }
-};
+using PriceChangedEvent = boost::signals2::signal<void(const std::string&, double)>;
 
 // Subject
 class Stock
@@ -19,9 +13,13 @@ class Stock
 private:
     std::string symbol_;
     double price_;
-    // TODO - kontener przechowywujacy obserwatorow
+
 public:
-    Stock(const std::string& symbol, double price) : symbol_(symbol), price_(price)
+    PriceChangedEvent price_changed;
+
+    Stock(const std::string& symbol, double price)
+        : symbol_(symbol)
+        , price_(price)
     {
     }
 
@@ -35,30 +33,30 @@ public:
         return price_;
     }
 
-    // TODO: rejestracja obserwatora
-
-    // TODO: wyrejestrowanie obserwatora
-
     void set_price(double price)
     {
-        price_ = price;
+        if (price != price_)
+        {
+            price_ = price;
 
-        // TODO: powiadomienie inwestorow o zmianie kursu...
+            price_changed(symbol_, price_);
+        }
     }
 };
 
-class Investor : public Observer
+class Investor 
 {
     std::string name_;
 
 public:
-    Investor(const std::string& name) : name_(name)
+    Investor(const std::string& name)
+        : name_(name)
     {
     }
 
-    void update(/*...*/)
+    void update(const std::string& symbol, double price)
     {
-        // TODO: implementacja
+        std::cout << name_ << " is notified on price change: " << symbol << " - " << price << "$\n";
     }
 };
 
