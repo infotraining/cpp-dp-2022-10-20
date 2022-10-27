@@ -36,7 +36,7 @@ class Context
     std::unique_ptr<State> state_;
 
 public:
-    Context(std::unique_ptr<State> initial_state) : state_{std::move(initial_state)}
+    Context() : state_{std::make_unique<ConcreteStateA>()}
     {
     }
 

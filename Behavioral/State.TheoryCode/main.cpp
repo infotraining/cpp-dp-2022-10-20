@@ -3,7 +3,7 @@
 int main()
 {
     // Setup context in a state
-    Context c{std::unique_ptr<State>{new ConcreteStateA}};
+    Context c;
 
     // Issue requests, which toggles state
     c.request();

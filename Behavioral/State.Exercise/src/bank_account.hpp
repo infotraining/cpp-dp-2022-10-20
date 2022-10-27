@@ -28,96 +28,130 @@ namespace Bank
         }
     };
 
-    enum AccountState
+    struct AccountContext
     {
-        overdraft,
-        normal
+        int id_;
+        double balance_;
+    };
+
+    class IAccountState
+    {
+    public:
+        ~IAccountState() = default;
+
+        virtual void withdraw(AccountContext& context, double amount) = 0;
+        virtual void pay_interest(AccountContext& context) = 0;
+        virtual std::string status(const AccountContext& context) const = 0;
+
+        static IAccountState* normalState;
+        static IAccountState* overdraftState;
+    };
+
+    class NormalAccountState : public IAccountState
+    {
+    public:
+        void withdraw(AccountContext& context, double amount) override
+        {
+            context.balance_ -= amount;
+        }
+
+        void pay_interest(AccountContext& context) override
+        {
+            context.balance_ += context.balance_ * 0.05;
+        }
+
+        std::string status(const AccountContext& context) const override
+        {
+            return "normal";
+        }
+    };
+
+    class OverdraftAccountState : public IAccountState
+    {
+    public:
+        void withdraw(AccountContext& context, double amount) override
+        {
+            throw InsufficientFunds{"Insufficient funds for account #" + std::to_string(context.id_), context.id_};
+        }
+
+        void pay_interest(AccountContext& context) override
+        {
+            context.balance_ += context.balance_ * 0.15;
+        }
+
+        std::string status(const AccountContext& context) const override
+        {
+            return "overdraft";
+        }
     };
 
     class BankAccount
     {
-        int id_;
-        double balance_;
-        AccountState state_;
+        AccountContext context_;
+        IAccountState* state_;
 
     protected:
         void update_account_state()
         {
-            if (balance_ < 0)
-                state_ = overdraft;
+            if (context_.balance_ < 0)
+                state_ = IAccountState::overdraftState;
             else
-                state_ = normal;
+                state_ = IAccountState::normalState;
         }
 
         void set_balance(double amount)
         {
-            balance_ = amount;
+            context_.balance_ = amount;
         }
 
     public:
         BankAccount(int id)
-            : id_(id)
-            , balance_(0.0)
-            , state_(normal)
+            : context_{id, 0.0}
+            , state_(IAccountState::normalState)
         {
         }
 
         void withdraw(double amount)
         {
             assert(amount > 0);
-
-            if (state_ == overdraft)
-            {
-                throw InsufficientFunds{"Insufficient funds for account #" + std::to_string(id_), id_};
-            }
-            else // state_ == normal
-            {
-                balance_ -= amount;
-
-                update_account_state();
-            }
+            state_->withdraw(context_, amount);
+            update_account_state();
         }
 
         void deposit(double amount)
         {
             assert(amount > 0);
 
-            balance_ += amount;
+            context_.balance_ += amount;
 
             update_account_state();
         }
 
         void pay_interest()
         {
-            if (state_ == overdraft)
-                balance_ += balance_ * 0.15;
-            else
-                balance_ += balance_ * 0.05;
+            state_->pay_interest(context_);
         }
 
         std::string status() const
         {
             std::stringstream strm;
-            strm << "BankAccount #" << id_ << "; State: ";
+            strm << "BankAccount #" << context_.id_ << "; State: ";
 
-            if (state_ == overdraft)
-                strm << "overdraft; ";
-            else
-                strm << "normal; ";
+            strm << state_->status(context_) << "; ";
 
-            strm << "Balance: " << std::to_string(balance_);
+            strm << "Balance: " << std::to_string(context_.balance_);
 
             return strm.str();
         }
 
         double balance() const
         {
-            return balance_;
+            return context_.balance_;
         }
 
         int id() const
         {
-            return id_;
+            return context_.id_;
         }
     };
 }

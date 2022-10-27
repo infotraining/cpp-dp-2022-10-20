@@ -39,7 +39,6 @@ enum class TurnstileState
 
 namespace Before
 {
-
     class Turnstile
     {
         TurnstileState state_;
@@ -177,15 +176,6 @@ namespace After
 
 namespace cpp17
 {
-    template <typename... Ts>
-    struct overloaded : Ts...
-    {
-        using Ts::operator()...;
-    };
-
-    template <typename... Ts>
-    overloaded(Ts...) -> overloaded<Ts...>; 
-
     class Turnstile
     {
         TurnstileAPI& api_;
@@ -242,7 +232,7 @@ namespace cpp17
 
         void pass()
         {
-             state_ = std::visit(PassEvent{api_}, state_);
+            state_ = std::visit(PassEvent{api_}, state_);
         }
 
         ::TurnstileState state() const
